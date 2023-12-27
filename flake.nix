@@ -87,9 +87,10 @@
           [
             "-isrc"
             "-Wall"
-            "src/Utils.hs"
-            "src/Path.hs"
-            "src/Direction.hs"
+            "-ilib"
+            "lib/Utils.hs"
+            "lib/Path.hs"
+            "lib/Direction.hs"
           ];
 
         haskellPackages = pkgs.haskellPackages.extend (
@@ -112,6 +113,21 @@
             ${myGHC}/bin/ghci ${toString flags} -interactive-print=Text.Pretty.Simple.pPrintLightBg
           '';
 
+        allDays = builtins.map (x: pkgs.lib.strings.removeSuffix ".hs" x) (builtins.attrNames (builtins.readDir ./src));
+
+        hspec = pkgs.writeTextDir "Main.hs"
+          ''
+            import Test.Hspec
+            ${builtins.concatStringsSep "\n"
+                  (builtins.map (x: "import ${x}") allDays)
+                }
+
+            main = hspec $ do
+              ${builtins.concatStringsSep "\n  "
+                  (builtins.map (x: "describe \"${x}\" $ ${x}.test") allDays)
+                }
+          '';
+
       in
       {
         devShells = {
@@ -125,6 +141,24 @@
         };
 
         packages = {
+          all = pkgs.runCommand "all"
+            {
+              buildInputs = [ myGHC ];
+
+            }
+            ''
+              set -x
+              mkdir src lib content
+              cp -r ${./src}/* src
+              cp -r ${./lib}/* lib
+              cp -r ${./content}/* content
+              cp ${hspec}/Main.hs Main.hs
+              find
+
+              mkdir -p $out/bin
+              ghc -O2 ${toString flags} Main.hs -o $out/bin/all
+            '';
+
           haskell-hie-bios = pkgs.writeShellScriptBin "haskell-hie-bios"
             ''
               for i in ${toString flags}
