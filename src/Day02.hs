@@ -48,7 +48,7 @@ checkGame g = g Map.! "green" <= 13
 
 -- * SECOND problem
 day' :: _ -> Int
-day' = undefined
+day' ex = sum $ fmap product $ map Map.elems $ map sumGame ex
 
 -- * Tests
 
@@ -63,12 +63,12 @@ test :: Spec
 test = do
   describe "simple examples" $ do
     it "of first star" $ do
-      day ex `shouldBe` 0
+      day ex `shouldBe` 8
     it "of second star" $ do
-      day' ex `shouldBe` 0
+      day' ex `shouldBe` 2286
   describe "works" $ do
     it "on first star" $ do
-      day fileContent `shouldBe` 1228
+      day fileContent `shouldBe` 2447
     it "on second star" $ do
-      day' fileContent `shouldBe` 1238
+      day' fileContent `shouldBe` 56322
 -- started at Wed Dec 27 10:18:34 PM +04 2023

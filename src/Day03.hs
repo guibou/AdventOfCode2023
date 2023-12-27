@@ -4,7 +4,6 @@ import Utils
 import Control.Monad
 import qualified Data.Text as Text
 import Data.Char
-import Debug.Trace
 import qualified Data.Map as Map
 
 fileContent :: _
@@ -22,7 +21,7 @@ sumNumbers t = do
   (lineNo, line) <- zip [0 :: Int ..] (Text.lines t)
   (colOffset, number) <- findNumbers line
   (line, col) <- squareAround lineNo colOffset (Text.length number)
-  pure ((line, col), read @Int $ traceShowId $ Text.unpack number)
+  pure ((line, col), read @Int $ Text.unpack number)
 
 findNumbers line = go 0 line
   where
@@ -80,12 +79,12 @@ test :: Spec
 test = do
   describe "simple examples" $ do
     it "of first star" $ do
-      day ex `shouldBe` 0
+      day ex `shouldBe` 4361
     it "of second star" $ do
-      day' ex `shouldBe` 0
+      day' ex `shouldBe` 467835
   describe "works" $ do
     it "on first star" $ do
-      day fileContent `shouldBe` 1228
+      day fileContent `shouldBe` 498559
     it "on second star" $ do
-      day' fileContent `shouldBe` 1238
+      day' fileContent `shouldBe` 72246648
 -- started at Wed Dec 27 10:43:20 PM +04 2023

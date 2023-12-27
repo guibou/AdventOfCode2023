@@ -3,7 +3,6 @@ module Day01 where
 import Data.Char (isDigit)
 import Data.Text qualified as T
 import Utils
-import Debug.Trace (traceShowId)
 
 fileContent :: _
 fileContent = parseContent $(getFile)
@@ -52,7 +51,7 @@ convertNumbersRight t = T.pack $ reverse $ go (reverse $ T.unpack t)
     
     go' ((prefix, repl):m') s@(x:xs)
       | isDigit x = [x]
-      | reverse (traceShowId prefix) `isPrefixOf` traceShowId s = repl
+      | reverse prefix `isPrefixOf` s = repl
       | otherwise = go' m' s
 
 -- * FIRST problem
@@ -90,14 +89,14 @@ test :: Spec
 test = do
   describe "simple examples" $ do
     it "of first star" $ do
-      day ex `shouldBe` 0
+      day ex `shouldBe` 142
     it "of second star" $ do
-      day' ex `shouldBe` 0
+      day' ex' `shouldBe` 281
   describe "works" $ do
     it "on first star" $ do
-      day fileContent `shouldBe` 1228
+      day fileContent `shouldBe` 55816
     it "on second star" $ do
-      day' fileContent `shouldBe` 1238
+      day' fileContent `shouldBe` 54980
 
 -- 54970 is too low
 -- started at Wed Dec 27 09:36:52 PM +04 2023
