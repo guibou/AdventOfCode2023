@@ -15,7 +15,6 @@ module Utils
     describe,
     it,
     Spec,
-    hspec,
     shouldBe,
     shouldReturn,
     here,
@@ -71,10 +70,11 @@ import PyF
 import Relude.Extra
 import Relude.Unsafe qualified as Unsafe
 import Safe (readMay)
-import Test.Hspec
+import Test.Syd
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import Text.Megaparsec.Char.Lexer qualified as L
+import GHC.Stack
 
 -- So I can use it in the shell
 -- dayX <$$> content

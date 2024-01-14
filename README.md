@@ -12,12 +12,15 @@ Starts a nix shell with `nix develop` (or use direnv).
 
 # Benchmarks
 
-You can run a global test using `nix run .#all -- --times`, it gives the individual test time as well as global timing. It uses `hspec` underneath, so you can use filtering (for performant execution of individual tests) or other nice features.
+You can run a global test using `nix run .#all`, it gives the individual test time as well as global timing. It uses `sydtest` underneath, so you can use filtering (for performant execution of individual tests) or other nice features.
 
 For example:
 
-- `nix run .#all  -- --times -m "works"` gives the timing only of the "star"
+- `nix run .#all  -- -f "works"` gives the timing only of the "star"
   problem, not examples.
-- `nix run .#all  -- --times -m "Day04"` focuses on `Day04`.
+- `nix run .#all  -- -f "Day 04"` focuses on `Day 04`.
 
 I'm targeting to run all problems in less than 1s.
+
+- `nix run .#bench` updates the `bench.json` and `bench.svg` files which
+  contains a summary of timings as wall as a bar plot.
