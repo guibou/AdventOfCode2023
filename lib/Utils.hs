@@ -12,11 +12,6 @@ module Utils
     Vector,
     module Data.Function.Memoize,
     module Linear,
-    describe,
-    it,
-    Spec,
-    shouldBe,
-    shouldReturn,
     here,
     hereLit,
     chunksOf,
@@ -44,7 +39,7 @@ import Crypto.Hash.MD5 qualified
 import Data.ByteString (ByteString)
 import Data.ByteString.Base16 (encode)
 import Data.Char (toLower)
-import Data.FileEmbed (embedStringFile)
+import Data.FileEmbed (embedFile)
 import Data.Function.Memoize
 import Data.Functor (($>))
 import Data.Functor.Identity
@@ -59,6 +54,7 @@ import Data.Set qualified as Set
 import Data.String.Here
 import Data.Text (Text)
 import Data.Text qualified as Text
+import Data.Text.Encoding qualified as Text
 import Data.Vector (Vector)
 import Data.Vector qualified as V
 import Data.Void
@@ -70,7 +66,6 @@ import PyF
 import Relude.Extra
 import Relude.Unsafe qualified as Unsafe
 import Safe (readMay)
-import Test.Syd
 import Text.Megaparsec
 import Text.Megaparsec.Char
 import Text.Megaparsec.Char.Lexer qualified as L
@@ -109,13 +104,16 @@ parBufferChunks l =
    in mconcat chunks `using` parBuffer 20 rdeepseq
 
 --
--- TODO: monomorphise it as text and do not fail if the file does not exists
+-- TODO: do not fail if the file does not exists
 -- (only warn)
 getFile :: Q Exp
-getFile =
-  qLocation >>= (\name -> do
-    let filename = "content/" <> map toLower name
-    embedStringFile filename) . loc_module
+getFile = do
+  loc <- qLocation
+  let name = loc_module loc
+  let filename = "content/" <> map toLower name
+  content <- embedFile filename
+
+  [|Text.decodeUtf8 $(pure content)|]
 
 zipIndex :: V.Vector t -> V.Vector (Int, t)
 zipIndex v = V.zip (V.enumFromN 0 (V.length v)) v
