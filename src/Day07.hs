@@ -14,9 +14,9 @@ parseContent = unsafeParse $ some parseHandBid
 
 parseHandBid = do
   hand <- parseHand
-  " "
-  bid <- parseNumber
-  "\n"
+  _ <- " "
+  bid <- parseNumber @Int
+  _ <- "\n"
 
   pure (hand, bid)
 
@@ -30,6 +30,7 @@ rankHand hand = do
         pure (c, 1)
   (getRank h, map rankLetters hand)
 
+getRank :: Map k Int -> Int
 getRank h = - case sort (Map.elems h) of
         [5] -> 0
         [1, 4] -> 1
@@ -40,7 +41,7 @@ getRank h = - case sort (Map.elems h) of
         [1, 1, 1, 1, 1] -> 6
         e -> error $ "getRank: " <> show e
 
-rankLetters '1' = 1
+rankLetters '1' = 1 :: Int
 rankLetters '2' = 2
 rankLetters '3' = 3
 rankLetters '4' = 4
@@ -75,13 +76,13 @@ rankHand' hand = do
           
   (rank, map rankLetters' hand)
 
-newHandFrom 0 keys = [[]]
+newHandFrom 0 _keys = [[]]
 newHandFrom n keys = do
   k <- keys
   l' <- ((k, 1):) <$> newHandFrom (n-1) keys
   pure $ l'
 
-rankLetters' '1' = 1
+rankLetters' '1' = 1 :: Int
 rankLetters' '2' = 2
 rankLetters' '3' = 3
 rankLetters' '4' = 4
