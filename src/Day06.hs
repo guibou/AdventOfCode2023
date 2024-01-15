@@ -23,7 +23,10 @@ scoreRace (time, record) = length $ filter (\(t, d) -> d > record) (raceDistance
 day races = product $ map scoreRace races
 
 -- * SECOND problem
-day' = undefined
+day' (unzip -> (times, records)) = do
+  let t = read $ concatMap show times
+  let r = read $ concatMap show records
+  scoreRace (t, r)
 
 ex = parseContent [str|Time:      7  15   30
 Distance:  9  40  200
