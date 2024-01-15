@@ -101,6 +101,7 @@
             "-Wno-name-shadowing"
             "-ilib"
             "-itests"
+            "-itemplate"
           ];
 
         haskellPackages = pkgs.haskellPackages.extend (

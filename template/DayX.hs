@@ -4,13 +4,15 @@ import Utils
 
 fileContent = parseContent $(getFile)
 
-parseContent = _
+parseContent = undefined
 
 -- * Generics
-
 
 -- * FIRST problem
 day = undefined
 
 -- * SECOND problem
 day' = undefined
+
+ex = undefined
+
