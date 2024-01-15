@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Eta reduce" #-}
 module Day04 where
 
 import Utils
@@ -6,22 +8,20 @@ import qualified Data.Set as Set
 import Data.Foldable
 import qualified Data.Map as Map
 
-fileContent :: _
 fileContent = parseContent $(getFile)
 
-parseContent :: Text -> _
 parseContent = unsafeParse (some (parseGame <* "\n"))
 
 
 parseGame = do
-  symbol "Card"
-  n <- parseNumber
-  symbol ":"
+  _ <- symbol "Card"
+  _n <- parseNumber @Int
+  _ <- symbol ":"
   wins <- some parseNumber
-  symbol "|"
+  _ <- symbol "|"
   mine <- some parseNumber
 
-  pure (wins, mine)
+  pure (wins :: [Int], mine :: [Int])
 -- * Generics
 
 
@@ -33,13 +33,13 @@ weightGame x = let
   in if l > 0 then 2 ^ (l - 1) else 0
 
 weightGame' (wins, mine) = let
-  l = length $ (Set.intersection (Set.fromList mine) (Set.fromList wins))
+  l = length (Set.intersection (Set.fromList mine) (Set.fromList wins))
   in l
 -- * SECOND problem
-day' games = sum $ Map.elems $ foldl' (flip f) (Map.fromList (zip [1..] (games $> 1))) (zip [1..] games)
+day' games = sum $ Map.elems $ foldl' (flip f) (Map.fromList (zip [1..] (games $> 1))) (zip [1 :: Int ..] games)
   where
     f (cardId, game) m = Map.unionsWith (+) [m,
-                                                Map.fromList ((,m Map.! cardId) <$> (take (weightGame' game) [cardId + 1 .. ]))]
+                                                Map.fromList ((,m Map.! cardId) <$> take (weightGame' game) [cardId + 1 .. ])]
 
 -- * Tests
 

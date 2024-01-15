@@ -5,25 +5,21 @@ import Control.Applicative.Combinators (sepBy)
 import Control.Applicative
 import qualified Data.Map as Map
 
-fileContent :: _
 fileContent = parseContent $(getFile)
 
-parseContent :: Text -> _
 parseContent = unsafeParse parseGames
 
 parseGame = do
-  "Game "
+  _ <- "Game "
   id :: Int <- parseNumber
-  ": "
+  _ <- ": "
   draws <- parseDraw `sepBy` "; "
 
   pure (id, draws)
 
 parseGames = some (parseGame <* "\n")
 
-parseDraw = do
-  colors <- parseColor `sepBy` ", "
-  pure colors
+parseDraw = parseColor `sepBy` ", "
 
 parseColor = do
   n :: Int <- parseNumber
@@ -34,10 +30,10 @@ parseColor = do
 
 
 -- * FIRST problem
-day ex = sum $ map fst $ filter (\(_, v) -> v) $ zip [1..] $ map checkGame $ map sumGame ex
+day ex = sum $ map fst $ filter snd $ zip [1..] $ map (checkGame . sumGame) ex
 
 
-sumGame (i, l) = Map.fromListWith f (concat l)
+sumGame (_i, l) = Map.fromListWith f (concat l)
   where
     f = max
 
@@ -46,7 +42,7 @@ checkGame g = g Map.! "green" <= 13
           && g Map.! "blue"<= 14
 
 -- * SECOND problem
-day' ex = sum $ fmap product $ map Map.elems $ map sumGame ex
+day' ex = sum $ fmap product $ Map.elems . sumGame <$> ex
 
 -- * Tests
 

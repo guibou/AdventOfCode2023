@@ -4,15 +4,14 @@ import Data.Char (isDigit)
 import Data.Text qualified as T
 import Utils
 
-fileContent :: _
 fileContent = parseContent $(getFile)
 
 parseContent :: Text -> [Text]
-parseContent t = T.lines t
+parseContent = T.lines
 
 -- * Generics
 
-extractNumber = (\t -> read @Int [T.head t, T.last t]) . (T.filter isDigit)
+extractNumber = (\t -> read @Int [T.head t, T.last t]) . T.filter isDigit
 
 convertionMap =
   [ ("one", "1"),
@@ -34,9 +33,9 @@ convertNumbersLeft t = T.pack $ go (T.unpack t)
     go s = go' convertionMap s
 
     go' [] [] = []
-    go' [] (x:xs) = go xs
+    go' [] (_x:xs) = go xs
     
-    go' ((prefix, repl):m') s@(x:xs)
+    go' ((prefix, repl):m') s@(x:_xs)
       | isDigit x = [x]
       | prefix `isPrefixOf` s = repl
       | otherwise = go' m' s
@@ -47,9 +46,9 @@ convertNumbersRight t = T.pack $ reverse $ go (reverse $ T.unpack t)
     go s = go' convertionMap s
 
     go' [] [] = []
-    go' [] (x:xs) = go xs
+    go' [] (_x:xs) = go xs
     
-    go' ((prefix, repl):m') s@(x:xs)
+    go' ((prefix, repl):m') s@(x:_xs)
       | isDigit x = [x]
       | reverse prefix `isPrefixOf` s = repl
       | otherwise = go' m' s

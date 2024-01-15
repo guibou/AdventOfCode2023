@@ -91,11 +91,16 @@
           [
             "-isrc"
             "-Wall"
+
+            # GHC is smart enough to infer correct type signatures most of the time
+            # I don't really care about this warning
+            "-Wno-missing-signatures"
+
+            # I hate that one, everytime it forces me to rename my symbol
+            # because of a stupid conflict and I break something
+            "-Wno-name-shadowing"
             "-ilib"
             "-itests"
-            "lib/Utils.hs"
-            "lib/Path.hs"
-            "lib/Direction.hs"
           ];
 
         haskellPackages = pkgs.haskellPackages.extend (
@@ -157,6 +162,8 @@
               do
                 echo $i >> $HIE_BIOS_OUTPUT
               done
+
+              echo "lib/Utils.hs" >> $HIE_BIOS_OUTPUT
             '';
         };
       });

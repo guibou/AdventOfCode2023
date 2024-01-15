@@ -9,7 +9,6 @@ import qualified Data.Map as Map
 fileContent :: Text
 fileContent = $(getFile)
 
-extractSymbol :: Text -> _
 extractSymbol t = do
   (lineNo, line) <- zip [0..] (Text.lines t)
   (colNo, c) <- zip [0..] (Text.unpack line)
@@ -23,7 +22,7 @@ sumNumbers t = do
   (line, col) <- squareAround lineNo colOffset (Text.length number)
   pure ((line, col), read @Int $ Text.unpack number)
 
-findNumbers line = go 0 line
+findNumbers = go 0
   where
    go offset t
      | Text.null t = []
@@ -40,8 +39,7 @@ squareAround line colOffset len = [(line, colOffset -1), (line, colOffset + len)
 
 sumMap t = do
   let
-    symbols = Map.fromList $ extractSymbol t
-    numsInfos = Map.fromListWith (\(a, b) (a', b') -> (a ++ a', b + b')) $ map (\(c, v) -> (c, ([v], 1))) $ sumNumbers t
+    numsInfos = Map.fromListWith (\(a, b) (a', b') -> (a ++ a', b + b')) $ map (\(c, v) -> (c, ([v], 1 :: Int))) $ sumNumbers t
   numsInfos
       
 
@@ -50,13 +48,13 @@ sumMap t = do
 day t = do
   let
    symbols = Map.fromList $ extractSymbol t
-  sum . concat . map fst . Map.elems . flip Map.intersection symbols . sumMap $ t
+  sum . concatMap fst . Map.elems . flip Map.intersection symbols . sumMap $ t
 
 -- * SECOND problem
 day' t = do
   let
    symbols = Map.fromList $ extractSymbol t
-  sum . map product . map fst . filter (\(a, c) -> c == 2) . Map.elems . flip Map.intersection (Map.filter (== '*') symbols) . sumMap $ t
+  sum . map (product . fst) . filter (\(_, c) -> c == 2) . Map.elems . flip Map.intersection (Map.filter (== '*') symbols) . sumMap $ t
 
 -- * Tests
 

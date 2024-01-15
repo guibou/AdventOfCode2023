@@ -1,7 +1,11 @@
+{-# OPTIONS_GHC -Wno-type-defaults #-}
 module DayXSpec where
 
 import DayX
 import Test.Syd
+
+-- We default to Int for performance, if Integer is required, it will be force typed on the different Day
+default (Int)
 
 spec :: Spec
 spec = do

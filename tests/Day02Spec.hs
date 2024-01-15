@@ -1,7 +1,10 @@
+{-# OPTIONS_GHC -Wno-type-defaults #-}
 module Day02Spec where
 
 import Test.Syd
 import Day02
+
+default (Int)
 
 spec :: Spec
 spec = do
