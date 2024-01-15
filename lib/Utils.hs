@@ -197,13 +197,6 @@ flipImage = Text.unlines . reverse . Text.lines
 
 -- * Tests Utile
 
-thisModuleName :: Q Exp
-thisModuleName = do
-  ModuleInfo mi <- reifyModule =<< thisModule
-  let t = filter ("Day" `isPrefixOf`) $ map (\(Module _ (ModName name)) -> name) mi
-
-  pure (ListE (map (\x -> TupE [Just $ LitE (StringL x), Just $ VarE (mkName (x ++ ".test"))]) t))
-
 pow10 :: Int -> Int
 pow10 a = 10 ^ a
 
