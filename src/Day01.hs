@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use first" #-}
 module Day01 where
 
 import Data.Char (isDigit)
@@ -13,7 +15,7 @@ parseContent = T.lines
 
 extractNumber = (\t -> read @Int [T.head t, T.last t]) . T.filter isDigit
 
-convertionMap =
+convertionMapLeft =
   [ ("one", "1"),
     ("two", "2"),
     ("three", "3"),
@@ -25,14 +27,17 @@ convertionMap =
     ("nine", "9")
   ]
 
+convertionMapRight = map (\(key, val) -> (reverse key, val)) convertionMapLeft
+
 convertNumbers = convertNumbersLeft . convertNumbersRight
 
-convertNumbersLeft t = T.pack $ go (T.unpack t)
+convert t convertionMap = T.pack $ go (T.unpack t)
   where
     go [] = []
     go s = go' convertionMap s
 
     go' [] [] = []
+    go' _ [] = []
     go' [] (_x:xs) = go xs
     
     go' ((prefix, repl):m') s@(x:_xs)
@@ -40,18 +45,8 @@ convertNumbersLeft t = T.pack $ go (T.unpack t)
       | prefix `isPrefixOf` s = repl
       | otherwise = go' m' s
 
-convertNumbersRight t = T.pack $ reverse $ go (reverse $ T.unpack t)
-  where
-    go [] = []
-    go s = go' convertionMap s
-
-    go' [] [] = []
-    go' [] (_x:xs) = go xs
-    
-    go' ((prefix, repl):m') s@(x:_xs)
-      | isDigit x = [x]
-      | reverse prefix `isPrefixOf` s = repl
-      | otherwise = go' m' s
+convertNumbersLeft t = convert t convertionMapLeft
+convertNumbersRight t = convert (T.reverse t) convertionMapRight
 
 -- * FIRST problem
 

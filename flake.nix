@@ -164,7 +164,7 @@
                 echo $i >> $HIE_BIOS_OUTPUT
               done
 
-              echo "lib/Utils.hs" >> $HIE_BIOS_OUTPUT
+              find -name "*.hs" >> $HIE_BIOS_OUTPUT
             '';
         };
       });

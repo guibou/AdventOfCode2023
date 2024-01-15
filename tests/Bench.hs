@@ -1,7 +1,9 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use :" #-}
+{-# HLINT ignore "Use <$>" #-}
 import Test.Syd
 import Test.Syd.OptParse (Settings (..), defaultSettings)
 import qualified Data.Map.Strict as Map
-import Data.Aeson (encodeFile)
 import Graphics.Rendering.Chart.Easy
 import Graphics.Rendering.Chart.Backend.Diagrams
 import qualified Data.Text as Text
@@ -16,7 +18,7 @@ main = do
     }
   res <- sydTestResult sets spec
 
-  let flattened = Map.fromListWith (+) $ map (\(name, v) -> (head name, ((fromIntegral $ timedTime $ testDefVal v) / (10^(6 :: Int) :: Double)) :: Double)) $ flattenSpecForest $ timedValue res
+  let flattened = Map.fromListWith (+) $ map (\(name, v) -> (head name, (fromIntegral ( timedTime $ testDefVal v) / (10^(6 :: Int) :: Double)) :: Double)) $ flattenSpecForest $ timedValue res
   
   -- Write bar plot
   toFile def "bench.svg" $ do
