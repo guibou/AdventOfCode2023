@@ -59,6 +59,7 @@
           "Chart"
           "Chart-diagrams"
           "aeson-pretty"
+          "range"
         ];
 
         extensions = [
@@ -85,6 +86,8 @@
           "ViewPatterns"
           "GHC2021"
           "NoFieldSelectors"
+          "DuplicateRecordFields"
+          "OverloadedRecordDot"
         ];
 
         flags = (builtins.map (e: "-X${e}") extensions)

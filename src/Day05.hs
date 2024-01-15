@@ -5,6 +5,8 @@ import Utils
 import Control.Applicative
 import Text.Megaparsec (oneOf, sepBy)
 import qualified Data.Map.Strict as Map
+import qualified Data.Range as Range
+import Data.Range ((+=+))
 
 fileContent = parseContent $(getFile)
 
@@ -49,18 +51,23 @@ rangeFunction Range{..} v
   | v >= source && v < source + length = Just (destination + v - source)
   | otherwise = Nothing
 
-chainRanges :: [Range] -> Int -> Int
+chainRanges :: [Range] -> [Seed] -> [Seed]
 chainRanges [] v = v
-chainRanges (r:rx) v = case rangeFunction r v of
-  Nothing -> chainRanges rx v
-  Just v -> v
+chainRanges (r:rx) v = do
+  let (changed, unchanged) = unzip (map (rangeSeedFunction r) v)
+  concat changed ++ chainRanges rx (concat unchanged)
 
 -- * FIRST problem
-day (seeds, maps) = do
+solve seeds maps = do
   let paths = Map.fromList $ do
         (a, b, ranges) <- maps
         pure (a, (b, ranges))
-  minimum $ map (followSeedPath paths "seed" "location") seeds
+  minimum $ map getLowerBound $ followSeedPath paths "seed" "location" seeds
+
+day (singleSeeds -> seeds, maps) = solve seeds maps
+
+getLowerBound (Seed (Range.SpanRange (Range.Bound a _) (Range.Bound _ _))) = a
+getLowerBound (Seed (Range.SingletonRange a)) = a
 
 followSeedPath paths current final value
   | current == final = value
@@ -70,10 +77,30 @@ followSeedPath paths current final value
     followSeedPath paths nextStep final value'
 
 -- * SECOND problem
-day' (seeds, maps) = day(extendSeeds seeds, maps)
+day' (extendSeeds -> seeds, maps) = solve seeds maps
 
+extendSeeds :: [Int] -> [Seed]
 extendSeeds [] = []
-extendSeeds (a:b:xs) = take b [a..] <> extendSeeds xs
+extendSeeds (a:b:xs) = (Seed $ a +=+ (a + b)):extendSeeds xs
+
+singleSeeds seeds = map (\s -> Seed (Range.SingletonRange s)) seeds
+
+newtype Seed = Seed (Range.Range Int)
+  deriving (Show)
+
+rangeSeedFunction :: Range -> Seed -> ([Seed], [Seed])
+rangeSeedFunction range (Seed seedRange) = do
+  let transformRange = range.source +=+ (range.source + range.length - 1)
+  let untouchedSeed = [seedRange] `Range.difference` [transformRange]
+  let transformedRange = [seedRange] `Range.intersection` [transformRange]
+
+  (map (translateRange (range.destination - range.source)) transformedRange, map Seed untouchedSeed)
+
+translateRange :: Int -> Range.Range Int -> Seed
+translateRange dr (Range.SpanRange (Range.Bound a _) (Range.Bound b _)) = Seed ((a + dr) +=+ (b + dr))
+translateRange dr (Range.SingletonRange x) = Seed (Range.SingletonRange (x + dr))
+translateRange _ r = error $ "Not handled range: " <> show r
+  
 
 ex = parseContent [str|seeds: 79 14 55 13
 
