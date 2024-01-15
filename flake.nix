@@ -158,7 +158,6 @@
         };
 
         packages = {
-          all = mkBinary "all" "tests/All.hs";
           bench = mkBinary "bench" "tests/Bench.hs";
 
           haskell-hie-bios = pkgs.writeShellScriptBin "haskell-hie-bios"
