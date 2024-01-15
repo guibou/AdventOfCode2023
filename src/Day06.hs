@@ -6,18 +6,20 @@ import Control.Applicative
 fileContent = parseContent $(getFile)
 
 parseContent = unsafeParse $ do
-  symbol "Time:"
-  times <- some parseNumber
-  "\n"
-  symbol "Distance:"
-  distances <- some parseNumber
-  "\n"
+  _ <- symbol "Time:"
+  times <- some (parseNumber @Int)
+  _ <- "\n"
+  _ <- symbol "Distance:"
+  distances <- some (parseNumber @Int)
+  _ <- "\n"
   pure (zip times distances)
 
 -- * Generics
 raceDistance time = map (\t -> (t, t * (time - t))) [0..time]
 
-scoreRace (time, record) = length $ filter (\(t, d) -> d > record) (raceDistance time)
+-- TODO: it is possible to solve the second order equation here instead of
+-- testing all possibilities.
+scoreRace (time, record) = length $ filter (\(_, d) -> d > record) (raceDistance time)
 
 -- * FIRST problem
 day races = product $ map scoreRace races
@@ -26,7 +28,7 @@ day races = product $ map scoreRace races
 day' (unzip -> (times, records)) = do
   let t = read $ concatMap show times
   let r = read $ concatMap show records
-  scoreRace (t, r)
+  scoreRace (t :: Int, r)
 
 ex = parseContent [str|Time:      7  15   30
 Distance:  9  40  200
