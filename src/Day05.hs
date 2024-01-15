@@ -31,18 +31,17 @@ parseRange = do
 
 parseMap = do
   a <- some (oneOf ['a'..'z'])
-  "-to-"
+  _ <- "-to-"
   b <- some (oneOf ['a'..'z'])
-  " map:\n"
+  _ <- " map:\n"
   ranges <- some (parseRange <* "\n")
 
   pure (a, b, ranges)
 
 parseSeed = do
-  "seeds: "
+  _ <- "seeds: "
   seeds <- some parseNumber
-  "\n"
-  "\n"
+  _ <- "\n\n"
   pure (seeds :: [Int])
 
 -- * Generics
@@ -66,8 +65,11 @@ solve seeds maps = do
 
 day (singleSeeds -> seeds, maps) = solve seeds maps
 
-getLowerBound (Seed (Range.SpanRange (Range.Bound a _) (Range.Bound _ _))) = a
+getLowerBound (Seed (Range.SpanRange (Range.Bound a inclusion) (Range.Bound _ _))) = case inclusion of
+  Range.Inclusive -> a
+  Range.Exclusive -> a + 1
 getLowerBound (Seed (Range.SingletonRange a)) = a
+getLowerBound (Seed r) = error $ "getLowerBound: partial: " <> show r
 
 followSeedPath paths current final value
   | current == final = value
@@ -82,6 +84,7 @@ day' (extendSeeds -> seeds, maps) = solve seeds maps
 extendSeeds :: [Int] -> [Seed]
 extendSeeds [] = []
 extendSeeds (a:b:xs) = (Seed $ a +=+ (a + b)):extendSeeds xs
+extendSeeds [_] = error "Unique seed in extendSeeds"
 
 singleSeeds seeds = map (\s -> Seed (Range.SingletonRange s)) seeds
 
