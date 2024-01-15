@@ -6,7 +6,7 @@ import qualified Data.Text as Text
 import Data.Char
 import qualified Data.Map as Map
 
-fileContent :: _
+fileContent :: Text
 fileContent = $(getFile)
 
 extractSymbol :: Text -> _
@@ -47,14 +47,12 @@ sumMap t = do
 
 
 -- * FIRST problem
-day :: _ -> Int
 day t = do
   let
    symbols = Map.fromList $ extractSymbol t
   sum . concat . map fst . Map.elems . flip Map.intersection symbols . sumMap $ t
 
 -- * SECOND problem
-day' :: _ -> Int
 day' t = do
   let
    symbols = Map.fromList $ extractSymbol t
@@ -74,17 +72,3 @@ ex = [str|467..114..
 ...$.*....
 .664.598..
 |]
-
-test :: Spec
-test = do
-  describe "simple examples" $ do
-    it "of first star" $ do
-      day ex `shouldBe` 4361
-    it "of second star" $ do
-      day' ex `shouldBe` 467835
-  describe "works" $ do
-    it "on first star" $ do
-      day fileContent `shouldBe` 498559
-    it "on second star" $ do
-      day' fileContent `shouldBe` 72246648
--- started at Wed Dec 27 10:43:20 PM +04 2023

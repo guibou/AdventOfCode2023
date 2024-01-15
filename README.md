@@ -24,3 +24,9 @@ I'm targeting to run all problems in less than 1s.
 
 - `nix run .#bench` updates the `bench.json` and `bench.svg` files which
   contains a summary of timings as wall as a bar plot.
+
+# Tests
+
+You can run the tests for one day in ghci using `:load tests/DayXXSpec.hs` and then `>>> sydTest spec`.
+
+You cn run all tests in ghci using `:load tests/All.hs` and then `>>> :main`.

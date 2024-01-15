@@ -56,16 +56,17 @@ convertNumbersRight t = T.pack $ reverse $ go (reverse $ T.unpack t)
 
 -- * FIRST problem
 
-day :: _ -> Int
+day :: [Text] -> Int
 day = sum . fmap extractNumber
 
 -- * SECOND problem
 
-day' :: _ -> Int
+day' :: [Text] -> Int
 day' ts = sum $ fmap (\t -> read (T.unpack $ convertNumbersLeft t <> convertNumbersRight t)) ts
 
 -- * Tests
 
+ex :: [Text]
 ex =
   parseContent
     [str|1abc2
@@ -84,19 +85,6 @@ xtwone3four
 zoneight234
 7pqrstsixteen
 |]
-
-test :: Spec
-test = do
-  describe "simple examples" $ do
-    it "of first star" $ do
-      day ex `shouldBe` 142
-    it "of second star" $ do
-      day' ex' `shouldBe` 281
-  describe "works" $ do
-    it "on first star" $ do
-      day fileContent `shouldBe` 55816
-    it "on second star" $ do
-      day' fileContent `shouldBe` 54980
 
 -- 54970 is too low
 -- started at Wed Dec 27 09:36:52 PM +04 2023

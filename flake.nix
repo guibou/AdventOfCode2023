@@ -27,6 +27,7 @@
           "here"
           "hex"
           "sydtest"
+          "sydtest-discover"
           "JuicyPixels"
           "lens"
           "linear"
@@ -57,6 +58,7 @@
           "array"
           "Chart"
           "Chart-diagrams"
+          "aeson-pretty"
         ];
 
         extensions = [
@@ -90,6 +92,7 @@
             "-isrc"
             "-Wall"
             "-ilib"
+            "-itests"
             "lib/Utils.hs"
             "lib/Path.hs"
             "lib/Direction.hs"
@@ -115,57 +118,23 @@
             ${myGHC}/bin/ghci ${toString flags} -interactive-print=Text.Pretty.Simple.pPrintLightBg
           '';
 
-        allDays = builtins.map (x: pkgs.lib.strings.removeSuffix ".hs" x) (builtins.attrNames (builtins.readDir ./src));
+        mkBinary = name: mainFile: 
+          pkgs.runCommand name
+            {
+              buildInputs = [ myGHC ];
 
-        sydtest = pkgs.writeTextDir "Main.hs"
-          ''
-            import Test.Syd
-            ${builtins.concatStringsSep "\n"
-                  (builtins.map (x: "import ${x}") allDays)
-                }
+            }
+            ''
+              set -x
+              mkdir src lib content tests
+              cp -r ${./src}/* src
+              cp -r ${./lib}/* lib
+              cp -r ${./content}/* content
+              cp -r ${./tests}/* tests
 
-            main = sydTest $ do
-              ${builtins.concatStringsSep "\n  "
-                  (builtins.map (x: "describe \"${x}\" $ ${x}.test") allDays)
-                }
-          '';
-
-        sydbench = pkgs.writeTextDir "Main.hs"
-          ''
-            import Test.Syd
-            import Test.Syd.OptParse (Settings (..), defaultSettings)
-            import qualified Data.Map.Strict as Map
-            import Data.Aeson (encodeFile)
-            import Graphics.Rendering.Chart.Easy
-            import Graphics.Rendering.Chart.Backend.Diagrams
-            import qualified Data.Text as Text
-
-            ${builtins.concatStringsSep "\n"
-                  (builtins.map (x: "import ${x}") allDays)
-                }
-
-            tests = do
-              ${builtins.concatStringsSep "\n  "
-                  (builtins.map (x: "describe \"${x}\" $ ${x}.test") allDays)
-                }
-
-            main = do
-              let sets = defaultSettings {
-                   settingFilters = ["works"]
-                }
-              res <- sydTestResult sets tests
-            
-              let flattened = Map.fromListWith (+) $ map (\(name, v) -> (head name, ((fromIntegral $ timedTime $ testDefVal v) / (10^(6 :: Int) :: Double)) :: Double)) $ flattenSpecForest $ timedValue res
-
-              print flattened
-              encodeFile "bench.json" flattened
-              toFile def "bench.svg" $ do
-                layout_title .= "Advent of code 2023"
-                layout_title_style . font_size .= 10
-                layout_x_axis . laxis_generate .= autoIndexAxis (map Text.unpack $ Map.keys flattened)
-                plot (fmap plotBars $ bars ["Time elapsed (ms)"] (addIndexes (map (\x -> [x]) $ Map.elems flattened)))
-          '';
-
+              mkdir -p $out/bin
+              ghc -O2 -threaded -rtsopts -with-rtsopts=-N ${toString flags} tests/Discover.hs ${mainFile} -o $out/bin/${name}
+            '';
       in
       {
         devShells = {
@@ -179,39 +148,8 @@
         };
 
         packages = {
-          all = pkgs.runCommand "all"
-            {
-              buildInputs = [ myGHC ];
-
-            }
-            ''
-              set -x
-              mkdir src lib content
-              cp -r ${./src}/* src
-              cp -r ${./lib}/* lib
-              cp -r ${./content}/* content
-              cp ${sydtest}/Main.hs Main.hs
-
-              mkdir -p $out/bin
-              ghc -O2 -threaded -rtsopts -with-rtsopts=-N ${toString flags} Main.hs -o $out/bin/all
-            '';
-
-          bench = pkgs.runCommand "bench"
-            {
-              buildInputs = [ myGHC ];
-
-            }
-            ''
-              set -x
-              mkdir src lib content
-              cp -r ${./src}/* src
-              cp -r ${./lib}/* lib
-              cp -r ${./content}/* content
-              cp ${sydbench}/Main.hs Main.hs
-
-              mkdir -p $out/bin
-              ghc -O2 -threaded -rtsopts -with-rtsopts=-N ${toString flags} Main.hs -o $out/bin/bench
-            '';
+          all = mkBinary "all" "tests/All.hs";
+          bench = mkBinary "bench" "tests/Bench.hs";
 
           haskell-hie-bios = pkgs.writeShellScriptBin "haskell-hie-bios"
             ''

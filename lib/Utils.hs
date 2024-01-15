@@ -109,7 +109,8 @@ parBufferChunks l =
    in mconcat chunks `using` parBuffer 20 rdeepseq
 
 --
-
+-- TODO: monomorphise it as text and do not fail if the file does not exists
+-- (only warn)
 getFile :: Q Exp
 getFile =
   qLocation >>= (\name -> do

@@ -5,3 +5,5 @@ cp template/DayX.hs src/Day$dayNumber.hs
 sed -i "s/DayX/Day$dayNumber/" src/Day$dayNumber.hs
 
 echo "-- started at $(date)" >> src/Day$dayNumber.hs
+
+git add tests/Day$dayNumbert.hs
