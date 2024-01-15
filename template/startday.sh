@@ -6,4 +6,4 @@ sed -i "s/DayX/Day$dayNumber/" src/Day$dayNumber.hs
 
 echo "-- started at $(date)" >> src/Day$dayNumber.hs
 
-git add tests/Day$dayNumbert.hs
+git add src/Day$dayNumber.hs

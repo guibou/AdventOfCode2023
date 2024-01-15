@@ -84,6 +84,7 @@
           "TypeApplications"
           "ViewPatterns"
           "GHC2021"
+          "NoFieldSelectors"
         ];
 
         flags = (builtins.map (e: "-X${e}") extensions)
