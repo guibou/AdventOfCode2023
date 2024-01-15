@@ -24,7 +24,7 @@ main = do
   toFile def "bench.svg" $ do
     layout_title .= "Advent of code 2023"
     layout_title_style . font_size .= 10
-    layout_x_axis . laxis_generate .= autoIndexAxis (map Text.unpack $ Map.keys flattened)
+    layout_x_axis . laxis_generate .= autoIndexAxis (map (take 5) $ map Text.unpack $ Map.keys flattened)
     plot (fmap plotBars $ bars ["Time elapsed (ms)"] (addIndexes (map (\x -> [x]) $ Map.elems flattened)))
 
   -- Encode to json, and add the sum of all runs

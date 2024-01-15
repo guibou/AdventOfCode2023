@@ -6,7 +6,6 @@ import Text.Megaparsec (oneOf)
 import qualified Data.Map.Strict as Map
 import Data.List (sortOn)
 import Data.Maybe
-import Debug.Trace
 
 fileContent = parseContent $(getFile)
 
@@ -55,23 +54,23 @@ rankLetters 'J' = 11
 rankLetters 'Q' = 12
 rankLetters 'K' = 13
 rankLetters 'A' = 14
-
+rankLetters l = error $ "Letters " <> show l <> " cannot be ranked."
 
 -- * FIRST problem
 day handsAndBids = sum $ zipWith (*) [1..] (map snd $ sortOn (\(hand, _bid) -> rankHand hand) handsAndBids)
 
 -- * SECOND problem
 rankHand' hand = do
-  let (traceShowId -> m') = Map.fromListWith (+) $ do
+  let m' = Map.fromListWith (+) $ do
         c <- hand
         pure (c, 1)
   let j = fromMaybe 0 $ Map.lookup 'J' m'
       m = Map.delete 'J' m'
   let rank
-        | j == 5 = 0
+        | j == 5 || j == 4 = 0
         | j == 0 = getRank m
         | otherwise = maximum $ do
-         (traceShowId -> m') <- newHandFrom j (Map.keys m)
+         m' <- newHandFrom j (Map.keys m)
          pure $ getRank (Map.unionWith (+) m (Map.fromListWith (+) m'))
           
   (rank, map rankLetters' hand)
@@ -82,20 +81,8 @@ newHandFrom n keys = do
   l' <- ((k, 1):) <$> newHandFrom (n-1) keys
   pure $ l'
 
-rankLetters' '1' = 1 :: Int
-rankLetters' '2' = 2
-rankLetters' '3' = 3
-rankLetters' '4' = 4
-rankLetters' '5' = 5
-rankLetters' '6' = 6
-rankLetters' '7' = 7
-rankLetters' '8' = 8
-rankLetters' '9' = 9
-rankLetters' 'T' = 10
 rankLetters' 'J' = 0
-rankLetters' 'Q' = 12
-rankLetters' 'K' = 13
-rankLetters' 'A' = 14
+rankLetters' l = rankLetters l
 
 
 -- * FIRST problem
