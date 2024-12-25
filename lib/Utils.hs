@@ -5,13 +5,14 @@
 {-# HLINT ignore "Redundant bracket" #-}
 {-# OPTIONS_GHC -Wno-orphans #-}
 {-# HLINT ignore "Replace case with fromMaybe" #-}
+{-# LANGUAGE DataKinds #-}
 
 module Utils
   ( module Utils,
-    module Relude.Extra,
     Vector,
     module Data.Function.Memoize,
     module Linear,
+    module Debug.Trace,
     here,
     hereLit,
     chunksOf,
@@ -28,6 +29,10 @@ module Utils
     module Data.Functor.Identity,
     ($>),
     (<$),
+
+    -- * Nice reexport
+    void, guard,
+    some, many,
   )
 where
 
@@ -45,7 +50,7 @@ import Data.Functor (($>))
 import Data.Functor.Identity
 import Data.HashMap.Strict qualified as HashMap
 import Data.Hashable (Hashable (..))
-import Data.List (isPrefixOf, sort)
+import Data.List (isPrefixOf, sort, sortBy, sortOn, foldl')
 import Data.List.Split (chunksOf)
 import Data.Map (Map)
 import Data.Map.Strict qualified as Map
@@ -66,10 +71,13 @@ import PyF
 import Relude.Extra
 import Relude.Unsafe qualified as Unsafe
 import Safe (readMay)
-import Text.Megaparsec
+import Text.Megaparsec hiding (many, some)
 import Text.Megaparsec.Char
 import Text.Megaparsec.Char.Lexer qualified as L
 import GHC.Stack
+import Debug.Trace
+import Control.Applicative (some, many)
+import GHC.Records
 
 -- So I can use it in the shell
 -- dayX <$$> content
@@ -273,3 +281,18 @@ unsafeSplitOn2 needle t = case Text.splitOn needle t of
 instance (Eq k, Hashable k) => MapLike (HashMap.HashMap k v) k v where
   lookup = HashMap.lookup
   add = HashMap.insert
+
+instance HasField "x" (V2 a) a where
+  getField (V2 x _) = x
+
+instance HasField "y" (V2 a) a where
+  getField (V2 _ y) = y
+
+instance HasField "x" (V3 a) a where
+  getField (V3 x _ _) = x
+
+instance HasField "y" (V3 a) a where
+  getField (V3 _ y _) = y
+
+instance HasField "z" (V3 a) a where
+  getField (V3 _ _ z) = z
