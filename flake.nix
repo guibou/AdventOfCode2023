@@ -60,6 +60,9 @@
           "Chart-diagrams"
           "aeson-pretty"
           "range"
+          "regex-tdfa"
+          "lens-regex-pcre"
+          "sbv"
         ];
 
         extensions = [
@@ -88,6 +91,7 @@
           "NoFieldSelectors"
           "DuplicateRecordFields"
           "OverloadedRecordDot"
+          "RecordWildCards"
         ];
 
         flags = (builtins.map (e: "-X${e}") extensions)
@@ -114,6 +118,8 @@
             {
 
               besout = unmarkBroken (doJailbreak hprev.besout);
+              #union-find = unmarkBroken (doJailbreak hprev.union-find);
+              sbv = dontCheck (unmarkBroken (doJailbreak hprev.sbv));
 
             }
         );
@@ -143,7 +149,7 @@
               cp -r ${./tests}/* tests
 
               mkdir -p $out/bin
-              ghc -O2 -threaded -rtsopts -with-rtsopts=-N ${toString flags} tests/Discover.hs ${mainFile} -o $out/bin/${name}
+              ghc --make -j -O2 -threaded -rtsopts -with-rtsopts=-N ${toString flags} tests/Discover.hs ${mainFile} -o $out/bin/${name}
             '';
       in
       {
